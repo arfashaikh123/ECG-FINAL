@@ -1,17 +1,17 @@
 @echo off
-title CardioScan Launcher
+title HeartAlert AI Launcher
 echo ===================================================
-echo   CardioScan: AI ECG Arrhythmia Detection System
+echo   HeartAlert AI: AI ECG Arrhythmia Detection System
 echo ===================================================
 
 echo.
-echo [1/2] Launching Flask Backend...
-start "CardioScan - Backend API" cmd /k "cd backend && venv\Scripts\activate && python app.py"
+echo [1/2] Starting Backend Server (Flask)...
+start "HeartAlert AI - Backend API" cmd /k "cd backend && venv\Scripts\activate && python app.py"
 
 echo.
-echo [2/2] Launching React Frontend...
+echo [2/2] Starting Frontend Interface (React)...
 :: The -- --open flag tells Vite to open the browser automatically
-start "CardioScan - Frontend UI" cmd /k "cd ecg-arrhythmia && npm run dev -- --open"
+start "HeartAlert AI - Frontend UI" cmd /k "cd ecg-arrhythmia && npm run dev -- --open"
 
 echo.
 echo ===================================================

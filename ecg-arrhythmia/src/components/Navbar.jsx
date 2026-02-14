@@ -15,7 +15,7 @@ export default function Navbar({ currentPage, onNavigate }) {
     const navItems = [
         { id: 'home', label: 'Home', icon: Heart },
         { id: 'scanner', label: 'ECG Scanner', icon: Activity },
-        { id: 'assistant', label: 'CardioAI', icon: Zap },
+        { id: 'assistant', label: 'AI Assistant', icon: Zap },
     ];
 
     return (
@@ -26,7 +26,7 @@ export default function Navbar({ currentPage, onNavigate }) {
                         <Heart size={22} />
                     </div>
                     <span className="brand-text">
-                        <span className="text-gradient">Cardio</span>Scan
+                        <span className="text-gradient">HeartAlert</span> AI
                     </span>
                 </button>
 

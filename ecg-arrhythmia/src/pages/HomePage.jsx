@@ -246,7 +246,7 @@ export default function HomePage({ onNavigate }) {
                             This tool is for educational and research purposes only.
                             Always consult qualified healthcare professionals for medical decisions.
                         </p>
-                        <p className="footer-copy">© 2026 CardioScan • Built with React & TensorFlow</p>
+                        <p className="footer-copy">© 2026 HeartAlert AI • Built with React & TensorFlow</p>
                     </div>
                 </div>
             </footer>
