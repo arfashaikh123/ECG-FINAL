@@ -92,10 +92,12 @@ def get_model():
     return _model
 
 
+from typing import Optional
+
 # ---------------------------------------------------------------------------
 # LLM helper (Groq)
 # ---------------------------------------------------------------------------
-def get_llm_response(user_message: str, context: dict | None = None) -> str:
+def get_llm_response(user_message: str, context: Optional[dict] = None) -> str:
     """Call Groq API (Llama 3) to get an LLM response about ECG / arrhythmia."""
     api_key = os.environ.get("GROQ_API_KEY")
     if not api_key:
