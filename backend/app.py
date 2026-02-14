@@ -88,9 +88,16 @@ def get_model():
             "MODEL_PATH",
             os.path.join(os.path.dirname(__file__), "best_model.h5"),
         )
-        _model = load_model(model_path)
+        _model = load_model(model_path, compile=False)
         print(f"[INFO] Model loaded from {model_path}")
     return _model
+
+@app.after_request
+def add_cors_headers(response):
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+    return response
 
 
 from typing import Optional
