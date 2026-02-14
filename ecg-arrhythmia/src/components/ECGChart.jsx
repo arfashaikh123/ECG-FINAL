@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import {
-    LineChart,
+    ComposedChart,
     Line,
     XAxis,
     YAxis,
@@ -13,14 +13,15 @@ import {
 } from 'recharts';
 import './ECGChart.css';
 
-export default function ECGChart({ signal, severity = 'normal', title = 'ECG Signal', minimal = false }) {
+export default function ECGChart({ signal, heatmap, severity = 'normal', title = 'ECG Signal', minimal = false }) {
     const data = useMemo(() => {
         if (!signal || signal.length === 0) return [];
         return signal.map((val, idx) => ({
             time: idx,
             value: val,
+            heatmapValue: heatmap ? (heatmap[idx] || 0) : 0,
         }));
-    }, [signal]);
+    }, [signal, heatmap]);
 
     const getColor = () => {
         switch (severity) {
@@ -67,18 +68,23 @@ export default function ECGChart({ signal, severity = 'normal', title = 'ECG Sig
                     <h3>{title}</h3>
                 </div>
                 <div className="ecg-chart-info">
+                    {heatmap && <span className="heatmap-legend-item"><span className="heatmap-dot"></span>AI Attention</span>}
                     <span className="ecg-sample-count">{signal?.length || 0} samples</span>
                 </div>
             </div>
 
             <div className="ecg-chart-body">
                 <ResponsiveContainer width="100%" height={280}>
-                    <LineChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                    <ComposedChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
                         <defs>
                             <linearGradient id="ecgGradient" x1="0" y1="0" x2="1" y2="0">
                                 <stop offset="0%" stopColor={color} stopOpacity={0.6} />
                                 <stop offset="50%" stopColor={color} stopOpacity={1} />
                                 <stop offset="100%" stopColor={color} stopOpacity={0.6} />
+                            </linearGradient>
+                            <linearGradient id="heatmapGradient" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stopColor="#ef4444" stopOpacity={0.4} />
+                                <stop offset="100%" stopColor="#ef4444" stopOpacity={0.05} />
                             </linearGradient>
                         </defs>
                         <CartesianGrid
@@ -97,6 +103,9 @@ export default function ECGChart({ signal, severity = 'normal', title = 'ECG Sig
                             tick={{ fontSize: 11, fill: 'var(--text-muted)' }}
                             label={{ value: 'Amplitude', angle: -90, position: 'insideLeft', offset: 15, style: { fill: 'var(--text-muted)', fontSize: 11 } }}
                         />
+                        {/* Secondary Y Axis for Heatmap */}
+                        <YAxis yAxisId="right" orientation="right" hide domain={[0, 1]} />
+
                         <Tooltip
                             contentStyle={{
                                 background: 'rgba(17, 24, 39, 0.95)',
@@ -107,7 +116,10 @@ export default function ECGChart({ signal, severity = 'normal', title = 'ECG Sig
                                 fontSize: '0.85rem',
                             }}
                             labelFormatter={(val) => `Sample: ${val}`}
-                            formatter={(val) => [val.toFixed(4), 'Amplitude']}
+                            formatter={(val, name) => [
+                                val.toFixed(4),
+                                name === 'heatmapValue' ? 'AI Attention' : 'Amplitude'
+                            ]}
                         />
                         <ReferenceLine
                             y={data.length > 0 ? data.reduce((acc, d) => acc + d.value, 0) / data.length : 0}
@@ -116,6 +128,16 @@ export default function ECGChart({ signal, severity = 'normal', title = 'ECG Sig
                             strokeOpacity={0.3}
                             label={{ value: 'Mean', position: 'right', style: { fill: 'var(--text-muted)', fontSize: 10 } }}
                         />
+                        {/* Heatmap Area */}
+                        {heatmap && (
+                            <Area
+                                yAxisId="right"
+                                type="monotone"
+                                dataKey="heatmapValue"
+                                stroke="none"
+                                fill="url(#heatmapGradient)"
+                            />
+                        )}
                         <Line
                             type="monotone"
                             dataKey="value"
@@ -129,7 +151,7 @@ export default function ECGChart({ signal, severity = 'normal', title = 'ECG Sig
                                 strokeWidth: 2,
                             }}
                         />
-                    </LineChart>
+                    </ComposedChart>
                 </ResponsiveContainer>
             </div>
 

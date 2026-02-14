@@ -335,7 +335,18 @@ def predict():
     label_idx = int(np.argmax(predictions, axis=1)[0])
     confidence = float(np.max(predictions[0]) * 100)
 
-    # --- Cleanup Memory ---
+    # Calculate SQI (Signal Quality Index) using SNR approximation
+    smoothed = np.convolve(raw, np.ones(5)/5, mode='same')
+    noise = raw - smoothed
+    snr = np.std(raw) / (np.std(noise) + 1e-6)
+    
+    sqi_quality = "Good"
+    if snr < 2.0:
+        sqi_quality = "Poor"
+    elif snr < 5.0:
+        sqi_quality = "Fair"
+
+    # Cleanup Memory
     if "model" in locals():
         del model
     if "df" in locals():
@@ -353,12 +364,36 @@ def predict():
             "signal": raw.tolist(),
             "total_rows": len(df),
             "analyzed_row": row,
+            "sqi_quality": sqi_quality,   # Added SQI
+            "snr_value": round(snr, 2),
             "model_accuracy": MODEL_ACCURACY,
             "probabilities": {
                 CLASS_MAPPING[i]: round(float(p) * 100, 2)
                 for i, p in enumerate(predictions[0])
             },
         }
+    )
+
+
+from report_generator import generate_pdf_report
+from flask import send_file
+
+import time
+
+@app.route("/api/report", methods=["POST"])
+def download_report():
+    """Generate and download a PDF report."""
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Missing report data"}), 400
+        
+    pdf_buffer = generate_pdf_report(data)
+    
+    return send_file(
+        pdf_buffer,
+        as_attachment=True,
+        download_name=f"cardioscan_report_{int(time.time())}.pdf",
+        mimetype='application/pdf'
     )
 
 

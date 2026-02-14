@@ -204,6 +204,48 @@
     animation: pulse-glow 2s infinite;
 }
 
+/* Actions */
+.result-actions {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Heatmap Legend */
+.heatmap-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: rgba(239, 68, 68, 0.1);
+    padding: 2px 8px;
+    border-radius: 99px;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.heatmap-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #ef4444;
+}
+
 @media (max-width: 768px) {
     .result-header {
         flex-direction: column;

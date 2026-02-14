@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
     Heart,
     AlertTriangle,
@@ -6,6 +7,10 @@ import {
     HelpCircle,
     Shield,
     TrendingUp,
+    FileText,
+    Brain,
+    Loader2,
+    Activity,
 } from 'lucide-react';
 import {
     PieChart,
@@ -15,6 +20,7 @@ import {
     Tooltip,
 } from 'recharts';
 import ECGChart from './ECGChart';
+import { generateReport, explainPrediction } from '../services/api';
 import './ResultCard.css';
 
 const SEVERITY_CONFIG = {
@@ -53,6 +59,10 @@ const SEVERITY_CONFIG = {
 const PIE_COLORS = ['#06d6a0', '#ffd166', '#ef476f', '#ff9f43', '#8b5cf6'];
 
 export default function ResultCard({ result }) {
+    const [heatmap, setHeatmap] = useState(null);
+    const [isExplaining, setIsExplaining] = useState(false);
+    const [isDownloading, setIsDownloading] = useState(false);
+
     if (!result) return null;
 
     const config = SEVERITY_CONFIG[result.severity] || SEVERITY_CONFIG.unknown;
@@ -64,6 +74,39 @@ export default function ResultCard({ result }) {
             value,
         }))
         : [];
+
+    const handleExplain = async () => {
+        try {
+            setIsExplaining(true);
+            const data = await explainPrediction(result.signal, result.label);
+            setHeatmap(data.heatmap);
+        } catch (error) {
+            console.error("Explanation failed:", error);
+            alert("Failed to generate AI explanation.");
+        } finally {
+            setIsExplaining(false);
+        }
+    };
+
+    const handleDownloadReport = async () => {
+        try {
+            setIsDownloading(true);
+            const blob = await generateReport(result);
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `cardioscan_report_${Date.now()}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        } catch (error) {
+            console.error("Download failed:", error);
+            alert("Failed to download report.");
+        } finally {
+            setIsDownloading(false);
+        }
+    };
 
     return (
         <div className={`result-card animate-fade-in ${config.bgClass}`}>
@@ -86,9 +129,34 @@ export default function ResultCard({ result }) {
                 </div>
             </div>
 
+            {/* Actions for Advanced Features */}
+            <div className="result-actions">
+                <button
+                    className="btn btn-secondary btn-sm"
+                    onClick={handleExplain}
+                    disabled={isExplaining || heatmap}
+                >
+                    {isExplaining ? <Loader2 size={16} className="spin" /> : <Brain size={16} />}
+                    {heatmap ? 'Explanation Active' : 'Explain Prediction (AI)'}
+                </button>
+                <button
+                    className="btn btn-outline btn-sm"
+                    onClick={handleDownloadReport}
+                    disabled={isDownloading}
+                >
+                    {isDownloading ? <Loader2 size={16} className="spin" /> : <FileText size={16} />}
+                    Download Medical Report
+                </button>
+            </div>
+
             {/* ECG Signal */}
             {result.signal && (
-                <ECGChart signal={result.signal} severity={result.severity} title="Analyzed ECG Signal" />
+                <ECGChart
+                    signal={result.signal}
+                    heatmap={heatmap}
+                    severity={result.severity}
+                    title="Analyzed ECG Signal"
+                />
             )}
 
             {/* Stats Row */}
@@ -101,21 +169,19 @@ export default function ResultCard({ result }) {
                     </div>
                 </div>
                 <div className="result-stat glass-card">
+                    <Activity size={18} style={{ color: result.sqi_quality === 'Poor' ? '#ef4444' : '#10b981' }} />
+                    <div>
+                        <span className="stat-value">{result.sqi_quality || 'N/A'}</span>
+                        <span className="stat-label">Signal Quality (SQI)</span>
+                    </div>
+                </div>
+                <div className="result-stat glass-card">
                     <TrendingUp size={18} style={{ color: '#118ab2' }} />
                     <div>
                         <span className="stat-value">{result.model_accuracy}%</span>
                         <span className="stat-label">Model Accuracy</span>
                     </div>
                 </div>
-                {result.total_rows !== undefined && (
-                    <div className="result-stat glass-card">
-                        <Heart size={18} style={{ color: '#73d2de' }} />
-                        <div>
-                            <span className="stat-value">Row {result.analyzed_row} / {result.total_rows}</span>
-                            <span className="stat-label">Analyzed Row</span>
-                        </div>
-                    </div>
-                )}
             </div>
 
             {/* Description */}
