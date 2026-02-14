@@ -13,6 +13,9 @@ app = Flask(__name__)
 # Enable CORS for all routes, allowing all origins, methods, and headers
 CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
+import gc
+import tensorflow as tf
+
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
@@ -179,6 +182,81 @@ def preprocess_signal(raw_values: np.ndarray) -> np.ndarray:
 
 
 # ---------------------------------------------------------------------------
+# Explainability (Occlusion Sensitivity)
+# ---------------------------------------------------------------------------
+def explain_prediction(model, signal, target_class_idx, window_size=10, stride=5):
+    """
+    Generate an importance heatmap using occlusion sensitivity.
+    We slide a zero-mask over the signal and measure the drop in confidence.
+    Higher drop = Higher importance.
+    """
+    heatmap = np.zeros_like(signal)
+    counts = np.zeros_like(signal)
+
+    # Base prediction probability for the target class
+    # Use batch prediction to speed up
+    # Create batch of occluded signals
+    occluded_batch = []
+    
+    # Base prediction
+    X_base = preprocess_signal(signal)
+    base_pred = model.predict(X_base, verbose=0)[0][target_class_idx]
+    
+    indices = []
+    for i in range(0, len(signal) - window_size, stride):
+        # Create occluded signal
+        occluded = signal.copy()
+        occluded[i : i + window_size] = 0  # Mask with zeros (baseline)
+        occluded_batch.append(preprocess_signal(occluded)[0])
+        indices.append(i)
+    
+    # Predict on batch
+    if occluded_batch:
+        X_batch = np.array(occluded_batch)
+        preds = model.predict(X_batch, verbose=0)
+        
+        for idx, i in enumerate(indices):
+            pred = preds[idx][target_class_idx]
+            importance = max(0, base_pred - pred)
+            heatmap[i : i + window_size] += importance
+            counts[i : i + window_size] += 1
+
+    # Average and normalize
+    safe_counts = np.maximum(counts, 1e-7)
+    heatmap = heatmap / safe_counts
+    
+    # Min-max scaling
+    h_min, h_max = np.min(heatmap), np.max(heatmap)
+    if h_max > h_min:
+        heatmap = (heatmap - h_min) / (h_max - h_min)
+    
+    return heatmap.tolist()
+
+
+@app.route("/api/explain", methods=["POST"])
+def explain():
+    """Explain a specific ECG prediction using occlusion sensitivity."""
+    model = get_model()
+    data = request.get_json()
+    signal = data.get("signal")
+    if not signal:
+        return jsonify({"error": "Missing signal"}), 400
+        
+    signal_arr = np.array(signal, dtype=np.float64)
+    label_idx = int(data.get("label", 0))
+    
+    heatmap = explain_prediction(model, signal_arr, label_idx)
+    
+    # Cleanup
+    if "model" in locals():
+        del model
+    tf.keras.backend.clear_session()
+    gc.collect()
+    
+    return jsonify({"heatmap": heatmap})
+
+
+# ---------------------------------------------------------------------------
 # Routes
 # ---------------------------------------------------------------------------
 @app.route("/api/health", methods=["GET"])
@@ -208,6 +286,12 @@ def predict():
         predictions = model.predict(X)
         label_idx = int(np.argmax(predictions, axis=1)[0])
         confidence = float(np.max(predictions[0]) * 100)
+
+        # Cleanup Memory
+        if "model" in locals():
+            del model
+        tf.keras.backend.clear_session()
+        gc.collect()
 
         return jsonify(
             {
@@ -250,6 +334,14 @@ def predict():
     predictions = model.predict(X)
     label_idx = int(np.argmax(predictions, axis=1)[0])
     confidence = float(np.max(predictions[0]) * 100)
+
+    # --- Cleanup Memory ---
+    if "model" in locals():
+        del model
+    if "df" in locals():
+        del df
+    tf.keras.backend.clear_session()
+    gc.collect()
 
     return jsonify(
         {
