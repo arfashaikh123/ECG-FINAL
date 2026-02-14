@@ -346,6 +346,9 @@ def predict():
     elif snr < 5.0:
         sqi_quality = "Fair"
 
+    # Capture metrics before cleanup
+    total_rows = len(df)
+
     # Cleanup Memory
     if "model" in locals():
         del model
@@ -362,9 +365,9 @@ def predict():
             "severity": CLASS_SEVERITY[label_idx],
             "confidence": round(confidence, 2),
             "signal": raw.tolist(),
-            "total_rows": len(df),
+            "total_rows": total_rows,
             "analyzed_row": row,
-            "sqi_quality": sqi_quality,   # Added SQI
+            "sqi_quality": sqi_quality,
             "snr_value": round(snr, 2),
             "model_accuracy": MODEL_ACCURACY,
             "probabilities": {
