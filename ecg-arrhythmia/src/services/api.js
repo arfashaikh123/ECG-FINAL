@@ -86,13 +86,3 @@ export async function explainPrediction(signal, label) {
   if (!res.ok) throw new Error('Explain failed');
   return res.json();
 }
-
-export async function generateReport(resultData) {
-  const res = await fetch(`${API_BASE}/api/report`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(resultData),
-  });
-  if (!res.ok) throw new Error('Report generation failed');
-  return res.blob(); // Return as blob for download
-}

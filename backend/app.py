@@ -375,28 +375,6 @@ def predict():
     )
 
 
-from report_generator import generate_pdf_report
-from flask import send_file
-
-import time
-
-@app.route("/api/report", methods=["POST"])
-def download_report():
-    """Generate and download a PDF report."""
-    data = request.get_json()
-    if not data:
-        return jsonify({"error": "Missing report data"}), 400
-        
-    pdf_buffer = generate_pdf_report(data)
-    
-    return send_file(
-        pdf_buffer,
-        as_attachment=True,
-        download_name=f"cardioscan_report_{int(time.time())}.pdf",
-        mimetype='application/pdf'
-    )
-
-
 @app.route("/api/predict/batch", methods=["POST"])
 def predict_batch():
     """Predict multiple rows from a CSV upload."""
