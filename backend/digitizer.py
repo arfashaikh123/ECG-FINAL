@@ -60,8 +60,9 @@ def process_image(file_stream):
     # Resample to TARGET_LENGTH (186)
     target_length = 186
     if len(extracted_signal) != target_length:
-        from scipy.signal import resample
-        # Start and end might be noise. We assume image is mostly ECG.
-        extracted_signal = resample(extracted_signal, target_length)
+        # Use simple linear interpolation to resize
+        x_old = np.linspace(0, 1, len(extracted_signal))
+        x_new = np.linspace(0, 1, target_length)
+        extracted_signal = np.interp(x_new, x_old, extracted_signal)
 
     return extracted_signal
