@@ -1,0 +1,224 @@
+/* ========================================
+   Scanner Page Styles
+   ======================================== */
+
+.scanner-page {
+    min-height: 100vh;
+    padding-top: 100px;
+    padding-bottom: var(--space-16);
+    position: relative;
+}
+
+.scanner-bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.scanner-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(148, 163, 184, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148, 163, 184, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+}
+
+/* Header */
+.scanner-header {
+    text-align: center;
+    margin-bottom: var(--space-10);
+}
+
+.scanner-header-icon {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent-primary-dim);
+    color: var(--accent-primary);
+    border-radius: var(--radius-lg);
+    margin: 0 auto var(--space-4);
+    border: 1px solid rgba(6, 214, 160, 0.2);
+}
+
+.scanner-header h1 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: var(--space-3);
+}
+
+.scanner-header p {
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+}
+
+/* Upload Area */
+.scanner-upload {
+    max-width: 680px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+}
+
+.scanner-controls {
+    padding: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.control-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.control-hint {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.scanner-divider {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.scanner-divider::before,
+.scanner-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border-primary);
+}
+
+.sample-btn {
+    align-self: center;
+}
+
+.scanner-error {
+    padding: var(--space-5);
+    text-align: center;
+}
+
+.scanner-error p:first-child {
+    color: var(--accent-danger);
+    font-weight: 600;
+    margin-bottom: var(--space-2);
+}
+
+.error-hint {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+/* Loading State */
+.scanner-loading {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.loading-card {
+    padding: var(--space-10);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-5);
+}
+
+.loading-animation {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ecg-pulse-ring {
+    position: absolute;
+    inset: 0;
+    border: 2px solid var(--accent-primary);
+    border-radius: 50%;
+    animation: pulse-glow 1.5s ease-out infinite;
+    opacity: 0.5;
+}
+
+.loading-icon {
+    color: var(--accent-primary);
+    animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+.loading-card h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.loading-card>p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.loading-steps {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    text-align: left;
+    width: 100%;
+    max-width: 300px;
+}
+
+.loading-step {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.loading-step.active {
+    color: var(--accent-primary);
+}
+
+.step-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--border-primary);
+    flex-shrink: 0;
+}
+
+/* Result */
+.scanner-result {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.result-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: var(--space-6);
+}
+
+@media (max-width: 768px) {
+    .scanner-page {
+        padding-top: 90px;
+    }
+}

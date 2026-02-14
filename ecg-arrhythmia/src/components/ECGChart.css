@@ -1,0 +1,61 @@
+.ecg-chart {
+    position: relative;
+    padding: var(--space-6);
+    overflow: hidden;
+}
+
+.ecg-chart-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-4);
+}
+
+.ecg-chart-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.ecg-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    animation: pulse-glow 2s infinite;
+}
+
+.ecg-chart-title h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.ecg-sample-count {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+}
+
+.ecg-chart-body {
+    position: relative;
+}
+
+.ecg-chart-minimal {
+    opacity: 0.8;
+}
+
+.ecg-scanline {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    animation: scanline 4s linear infinite;
+    opacity: 0.4;
+}
+
+/* recharts tooltip override */
+.recharts-tooltip-cursor {
+    stroke: rgba(6, 214, 160, 0.2) !important;
+}
