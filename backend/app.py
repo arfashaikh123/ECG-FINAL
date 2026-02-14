@@ -10,7 +10,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, origins="*")
+# Enable CORS for all routes, allowing all origins, methods, and headers
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
 # ---------------------------------------------------------------------------
 # Constants
