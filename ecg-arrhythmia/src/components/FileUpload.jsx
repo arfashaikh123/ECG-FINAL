@@ -22,10 +22,16 @@ export default function FileUpload({ onFileSelect, isLoading }) {
 
     const { getRootProps, getInputProps, isDragActive, acceptedFiles } = useDropzone({
         onDrop,
-        accept: { 'text/csv': ['.csv'] },
+        accept: {
+            'text/csv': ['.csv'],
+            'image/png': ['.png'],
+            'image/jpeg': ['.jpg', '.jpeg']
+        },
         maxFiles: 1,
         disabled: isLoading,
     });
+
+    const isImage = acceptedFiles.length > 0 && acceptedFiles[0].type.startsWith('image/');
 
     return (
         <div className="file-upload-wrapper">
@@ -38,8 +44,8 @@ export default function FileUpload({ onFileSelect, isLoading }) {
                 <div className="dropzone-content">
                     {acceptedFiles.length > 0 ? (
                         <>
-                            <div className="dropzone-icon dropzone-icon-success">
-                                <FileSpreadsheet size={36} />
+                            <div className={`dropzone-icon ${isImage ? 'dropzone-icon-image' : 'dropzone-icon-success'}`}>
+                                {isImage ? <FileSpreadsheet size={36} /> : <FileSpreadsheet size={36} />}
                             </div>
                             <p className="dropzone-filename">{acceptedFiles[0].name}</p>
                             <p className="dropzone-hint">
@@ -52,10 +58,10 @@ export default function FileUpload({ onFileSelect, isLoading }) {
                                 <Upload size={36} />
                             </div>
                             <p className="dropzone-text">
-                                {isDragActive ? 'Drop your ECG file here...' : 'Drag & drop your ECG CSV file'}
+                                {isDragActive ? 'Drop your file here...' : 'Upload ECG (CSV or Image)'}
                             </p>
                             <p className="dropzone-hint">
-                                or click to browse • Supports MIT-BIH format CSV
+                                Supports .csv, .png, .jpg
                             </p>
                         </>
                     )}

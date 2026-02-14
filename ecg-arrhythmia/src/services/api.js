@@ -22,6 +22,21 @@ export async function predictFromCSV(file, row = 0) {
   return res.json();
 }
 
+export async function predictFromImage(file) {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const res = await fetch(`${API_BASE}/api/predict/image`, {
+    method: 'POST',
+    body: formData,
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || 'Image analysis failed');
+  }
+  return res.json();
+}
+
 export async function predictFromSignal(signal) {
   const res = await fetch(`${API_BASE}/api/predict`, {
     method: 'POST',

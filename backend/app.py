@@ -264,6 +264,65 @@ def health():
     return jsonify({"status": "healthy", "model_accuracy": MODEL_ACCURACY})
 
 
+
+# ---------------------------------------------------------------------------
+# Image Digitizer Integration
+# ---------------------------------------------------------------------------
+import digitizer
+
+@app.route("/api/predict/image", methods=["POST"])
+def predict_image():
+    """Extract signal from ECG image and predict."""
+    if "file" not in request.files:
+        return jsonify({"error": "No image file uploaded"}), 400
+        
+    file = request.files["file"]
+    try:
+        # Extract signal using digitizer
+        raw_signal = digitizer.process_image(file.stream)
+        
+        # Preprocess and Predict
+        model = get_model()
+        X = preprocess_signal(raw_signal)
+        predictions = model.predict(X)
+        
+        label_idx = int(np.argmax(predictions, axis=1)[0])
+        confidence = float(np.max(predictions[0]) * 100)
+        
+        # Calculate SQI
+        smoothed = np.convolve(raw_signal, np.ones(5)/5, mode='same')
+        noise = raw_signal - smoothed
+        snr = np.std(raw_signal) / (np.std(noise) + 1e-6)
+        
+        sqi_quality = "Good"
+        if snr < 2.0: sqi_quality = "Poor"
+        elif snr < 5.0: sqi_quality = "Fair"
+
+        # Cleanup
+        if "model" in locals(): del model
+        tf.keras.backend.clear_session()
+        gc.collect()
+
+        return jsonify({
+            "label": label_idx,
+            "beat_type": CLASS_MAPPING[label_idx],
+            "description": CLASS_DESCRIPTIONS[label_idx],
+            "severity": CLASS_SEVERITY[label_idx],
+            "confidence": round(confidence, 2),
+            "signal": raw_signal.tolist(),
+            "sqi_quality": sqi_quality,
+            "snr_value": round(snr, 2),
+            "model_accuracy": MODEL_ACCURACY,
+            "probabilities": {
+                CLASS_MAPPING[i]: round(float(p) * 100, 2)
+                for i, p in enumerate(predictions[0])
+            },
+        })
+
+    except Exception as e:
+        return jsonify({"error": f"Image processing failed: {str(e)}"}), 500
+
+
 @app.route("/api/predict", methods=["POST"])
 def predict():
     """
