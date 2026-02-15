@@ -174,7 +174,7 @@ export default function ScannerPage({ onAnalysisComplete }) {
                                 <Activity size={40} className="loading-icon" />
                             </div>
                             <h2>Analyzing ECG Signal...</h2>
-                            <p>Processing signal through our 2D CNN deep learning model</p>
+                            <p>Processing signal through our 1D-CNN deep learning model</p>
                             <div className="loading-steps">
                                 <div className="loading-step active">
                                     <Loader2 size={14} className="spinner-icon" />

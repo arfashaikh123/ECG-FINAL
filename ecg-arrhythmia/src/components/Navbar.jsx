@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Heart, Activity, Menu, X, Zap } from 'lucide-react';
+import { Heart, Activity, Menu, X, Zap, BarChart2, Info } from 'lucide-react';
 import './Navbar.css';
 
 export default function Navbar({ currentPage, onNavigate }) {
@@ -15,6 +15,8 @@ export default function Navbar({ currentPage, onNavigate }) {
     const navItems = [
         { id: 'home', label: 'Home', icon: Heart },
         { id: 'scanner', label: 'ECG Scanner', icon: Activity },
+        { id: 'evaluation', label: 'Evaluation', icon: BarChart2 },
+        { id: 'about', label: 'About', icon: Info },
         { id: 'assistant', label: 'AI Assistant', icon: Zap },
     ];
 

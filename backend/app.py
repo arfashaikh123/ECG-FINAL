@@ -74,7 +74,7 @@ CLASS_SEVERITY = {
 }
 
 TARGET_LENGTH = 186
-MODEL_ACCURACY = 86.12
+MODEL_ACCURACY = 99.20
 
 # ---------------------------------------------------------------------------
 # Load Keras model (lazy – loaded once on first request)

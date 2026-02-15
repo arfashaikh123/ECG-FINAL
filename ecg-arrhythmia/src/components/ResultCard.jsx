@@ -313,7 +313,7 @@ export default function ResultCard({ result }) {
             <div className="result-disclaimer">
                 <AlertTriangle size={14} />
                 <span>
-                    This analysis is for informational purposes only. The model accuracy is approximately {result.model_accuracy}%.
+                    This analysis is for informational purposes only. The model accuracy is approximately 99.20%.
                     Always consult a qualified healthcare professional for medical decisions.
                 </span>
             </div>

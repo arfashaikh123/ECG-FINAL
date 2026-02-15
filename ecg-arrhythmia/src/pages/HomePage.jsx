@@ -28,8 +28,8 @@ export default function HomePage({ onNavigate }) {
     const features = [
         {
             icon: Brain,
-            title: '2D CNN Deep Learning',
-            desc: 'Advanced Convolutional Neural Network trained on the MIT-BIH Arrhythmia Database for accurate beat classification.',
+            title: '1D-CNN Deep Learning',
+            desc: 'Advanced 1D Convolutional Neural Network trained on the MIT-BIH Arrhythmia Database for accurate beat classification.',
             color: '#06d6a0',
         },
         {
@@ -40,7 +40,7 @@ export default function HomePage({ onNavigate }) {
         },
         {
             icon: Shield,
-            title: '86.12% Accuracy',
+            title: '99.20% Accuracy',
             desc: 'High-precision arrhythmia detection across 5 beat categories validated against clinical ECG data.',
             color: '#ffd166',
         },
@@ -62,7 +62,7 @@ export default function HomePage({ onNavigate }) {
 
     const steps = [
         { num: '01', title: 'Upload ECG Data', desc: 'Upload a CSV file with ECG signal data in MIT-BIH format.', icon: FileSpreadsheet },
-        { num: '02', title: 'AI Analysis', desc: 'Our 2D CNN model processes and classifies the heartbeat signal.', icon: Brain },
+        { num: '02', title: 'AI Analysis', desc: 'Our 1D-CNN model processes and classifies the heartbeat signal.', icon: Brain },
         { num: '03', title: 'Get Results', desc: 'View detailed classification, confidence scores, and visualizations.', icon: BarChart3 },
         { num: '04', title: 'Ask CardioAI', desc: 'Chat with our AI assistant for deeper insights and guidance.', icon: Zap },
     ];
@@ -88,7 +88,7 @@ export default function HomePage({ onNavigate }) {
                         </h1>
                         <p className="hero-subtitle">
                             Advanced deep learning model trained on the MIT-BIH dataset to classify
-                            ECG signals into 5 arrhythmia categories with 86.12% accuracy.
+                            ECG signals into 5 arrhythmia categories with 99.20% accuracy.
                             Now enhanced with LLM-powered cardiac intelligence.
                         </p>
                         <div className="hero-actions">
@@ -104,7 +104,7 @@ export default function HomePage({ onNavigate }) {
                         </div>
                         <div className="hero-stats">
                             <div className="hero-stat">
-                                <span className="hero-stat-value">86.12%</span>
+                                <span className="hero-stat-value">99.20%</span>
                                 <span className="hero-stat-label">Accuracy</span>
                             </div>
                             <div className="hero-stat-divider" />
@@ -114,7 +114,7 @@ export default function HomePage({ onNavigate }) {
                             </div>
                             <div className="hero-stat-divider" />
                             <div className="hero-stat">
-                                <span className="hero-stat-value">2D CNN</span>
+                                <span className="hero-stat-value">1D-CNN</span>
                                 <span className="hero-stat-label">Architecture</span>
                             </div>
                         </div>

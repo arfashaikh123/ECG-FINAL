@@ -3,6 +3,8 @@ import Navbar from './components/Navbar';
 import HomePage from './pages/HomePage';
 import ScannerPage from './pages/ScannerPage';
 import AssistantPage from './pages/AssistantPage';
+import EvaluationPage from './pages/EvaluationPage';
+import AboutPage from './pages/AboutPage';
 import './App.css';
 
 function App() {
@@ -22,6 +24,10 @@ function App() {
     switch (currentPage) {
       case 'scanner':
         return <ScannerPage onAnalysisComplete={handleAnalysisComplete} />;
+      case 'evaluation':
+        return <EvaluationPage />;
+      case 'about':
+        return <AboutPage />;
       case 'assistant':
         return <AssistantPage analysisContext={analysisContext} />;
       default:
