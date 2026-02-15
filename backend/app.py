@@ -123,7 +123,7 @@ def get_llm_response(user_message: str, context: Optional[dict] = None) -> str:
         client = Groq(api_key=api_key)
         
         system_prompt = (
-            "You are CardioAI, a helpful medical AI assistant specializing in "
+            "You are HeartAI, a helpful medical AI assistant specializing in "
             "ECG analysis and cardiac arrhythmias. You provide clear, accurate, "
             "and educational information about heart conditions, ECG "
             "interpretations, and arrhythmia types. Always remind users to "
@@ -235,7 +235,7 @@ def explain_prediction(model, signal, target_class_idx, window_size=10, stride=5
 
 @app.route("/api/explain", methods=["POST"])
 def explain():
-    """Explain a specific ECG prediction using occlusion sensitivity."""
+    """Explain a specific ECG prediction using occlusion sensitivity AND LLM text."""
     model = get_model()
     data = request.get_json()
     signal = data.get("signal")
@@ -245,15 +245,38 @@ def explain():
     signal_arr = np.array(signal, dtype=np.float64)
     label_idx = int(data.get("label", 0))
     
+    # 1. Visual Explanation (Heatmap)
     heatmap = explain_prediction(model, signal_arr, label_idx)
     
+    # 2. Textual Explanation (LLM)
+    # We construct a prompt detailing the finding and asking for clinical context.
+    beat_type = CLASS_MAPPING.get(label_idx, "Unknown")
+    severity = CLASS_SEVERITY.get(label_idx, "unknown")
+    
+    explanation_prompt = (
+        f"Act as an expert cardiologist explaining an ECG finding to a patient. "
+        f"The ECG analysis has detected: '{beat_type}' (Severity: {severity}).\n\n"
+        f"Please provide a detailed explanation structured as follows:\n"
+        f"1. **What is this?**: Briefly define '{beat_type}'.\n"
+        f"2. **Comparison with Normal Heartbeat**: Explicitly compare the structure of a Normal Sinus Rhythm (which has a clear P-wave, narrow QRS complex, and regular rhythm) "
+        f"with the structure of this specific '{beat_type}'. Highlight differences in P-waves, QRS width, or morphology.\n"
+        f"3. **Key Characteristics**: List the specific visual features seen in the ECG for this arrhythmia (e.g., 'premature beat', 'wide QRS', 'compensatory pause').\n"
+        f"4. **Clinical implication**: Briefly mention if this is generally benign or requires attention (based on Severity: {severity}).\n\n"
+        f"Keep the tone reassuring but clinical and precise. Use bullet points for clarity."
+    )
+    
+    explanation_text = get_llm_response(explanation_prompt)
+
     # Cleanup
     if "model" in locals():
         del model
     tf.keras.backend.clear_session()
     gc.collect()
     
-    return jsonify({"heatmap": heatmap})
+    return jsonify({
+        "heatmap": heatmap,
+        "explanation_text": explanation_text
+    })
 
 
 # ---------------------------------------------------------------------------

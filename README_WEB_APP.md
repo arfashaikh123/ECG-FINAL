@@ -1,4 +1,4 @@
-# CardioScan: AI-Powered ECG Arrhythmia Detection
+# HeartAI: AI-Powered ECG Arrhythmia Detection
 
 This project is a modern web application for detecting cardiac arrhythmias using Deep Learning (2D CNN) and providing AI-powered insights via Google Gemini.
 
@@ -8,7 +8,7 @@ This project is a modern web application for detecting cardiac arrhythmias using
   - Interactive ECG visualization
   - Dark-themed medical UI
   - Real-time analysis dashboard
-  - Chat interface with CardioAI
+  - Chat interface with HeartAI
 
 - **`backend/`**: Python Backend (Flask)
   - 2D CNN Model (`best_model.h5`)

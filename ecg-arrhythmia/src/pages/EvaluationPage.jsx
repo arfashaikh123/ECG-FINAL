@@ -45,7 +45,7 @@ export default function EvaluationPage() {
             <div className="container">
                 <div className="eval-header text-center">
                     <h1>Model <span className="text-gradient">Evaluation</span></h1>
-                    <p className="lead">Detailed performance metrics of the HeartAlert AI CNN Model.</p>
+                    <p className="lead">Detailed performance metrics of the <span className="text-gradient">Heart</span>AI CNN Model.</p>
                 </div>
 
                 <div className="kpi-grid">

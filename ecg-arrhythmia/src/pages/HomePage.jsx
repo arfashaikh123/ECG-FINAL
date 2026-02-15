@@ -47,7 +47,7 @@ export default function HomePage({ onNavigate }) {
         {
             icon: Zap,
             title: 'AI-Powered Insights',
-            desc: 'Integrated LLM assistant (CardioAI) for intelligent ECG interpretation and cardiac health guidance.',
+            desc: 'Integrated LLM assistant (HeartAI) for intelligent ECG interpretation and cardiac health guidance.',
             color: '#8b5cf6',
         },
     ];
@@ -64,7 +64,7 @@ export default function HomePage({ onNavigate }) {
         { num: '01', title: 'Upload ECG Data', desc: 'Upload a CSV file with ECG signal data in MIT-BIH format.', icon: FileSpreadsheet },
         { num: '02', title: 'AI Analysis', desc: 'Our 1D-CNN model processes and classifies the heartbeat signal.', icon: Brain },
         { num: '03', title: 'Get Results', desc: 'View detailed classification, confidence scores, and visualizations.', icon: BarChart3 },
-        { num: '04', title: 'Ask CardioAI', desc: 'Chat with our AI assistant for deeper insights and guidance.', icon: Zap },
+        { num: '04', title: 'Ask HeartAI', desc: 'Chat with our AI assistant for deeper insights and guidance.', icon: Zap },
     ];
 
     return (
@@ -99,7 +99,7 @@ export default function HomePage({ onNavigate }) {
                             </button>
                             <button className="btn btn-secondary btn-lg" onClick={() => onNavigate('assistant')} id="hero-ai-btn">
                                 <Zap size={20} />
-                                Ask CardioAI
+                                Ask HeartAI
                             </button>
                         </div>
                         <div className="hero-stats">
@@ -240,13 +240,13 @@ export default function HomePage({ onNavigate }) {
                     <div className="footer-content">
                         <div className="footer-brand">
                             <Heart size={20} style={{ color: 'var(--accent-primary)' }} />
-                            <span className="brand-text"><span className="text-gradient">Cardio</span>Scan</span>
+                            <span className="brand-text"><span className="text-gradient">Heart</span>AI</span>
                         </div>
                         <p className="footer-disclaimer">
                             This tool is for educational and research purposes only.
                             Always consult qualified healthcare professionals for medical decisions.
                         </p>
-                        <p className="footer-copy">© 2026 HeartAlert AI • Built with React & TensorFlow</p>
+                        <p className="footer-copy">© 2026 HeartAI • Built with React & TensorFlow</p>
                     </div>
                 </div>
             </footer>

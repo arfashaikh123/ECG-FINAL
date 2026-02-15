@@ -8,7 +8,7 @@ export default function AboutPage() {
         <div className="about-page animate-fade-in">
             <div className="container">
                 <div className="about-header text-center">
-                    <h1>About <span className="text-gradient">HeartAlert AI</span></h1>
+                    <h1>About <span className="text-gradient">Heart</span>AI</h1>
                     <p className="lead">Pioneering AI-driven cardiac health monitoring.</p>
                 </div>
 
@@ -57,7 +57,7 @@ export default function AboutPage() {
                 <div className="about-section glass-card">
                     <h2><Activity className="icon-blue" size={24} /> The Mission</h2>
                     <p>
-                        HeartAlert AI is designed to democratize access to advanced cardiac arrhythmia detection.
+                        HeartAI is designed to democratize access to advanced cardiac arrhythmia detection.
                         By leveraging state-of-the-art deep learning technology, we aim to provide instant,
                         accurate preliminary screenings for common heart rhythm abnormalities, acting as a powerful
                         assistant to healthcare professionals and students.
@@ -164,7 +164,7 @@ export default function AboutPage() {
                 <div className="disclaimer-section glass-card">
                     <h3><Shield className="icon-red" size={24} /> Medical Disclaimer</h3>
                     <p>
-                        HeartAlert AI is a research and educational tool. <strong>It is not a replacement for professional medical advice,
+                        HeartAI is a research and educational tool. <strong>It is not a replacement for professional medical advice,
                             diagnosis, or treatment.</strong> Always seek the advice of your physician or qualified health provider
                         with any questions you may have regarding a medical condition.
                     </p>

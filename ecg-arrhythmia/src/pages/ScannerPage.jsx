@@ -99,7 +99,7 @@ export default function ScannerPage({ onAnalysisComplete }) {
                     <div className="scanner-header-icon">
                         <Activity size={28} />
                     </div>
-                    <h1>HeartAlert <span className="text-gradient">AI</span></h1>
+                    <h1><span className="text-gradient">Heart</span>AI <span className="text-gradient">Analysis</span></h1>
                     <p>Upload your ECG data for instant AI-powered arrhythmia detection</p>
                 </div>
 

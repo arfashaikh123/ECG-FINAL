@@ -28,7 +28,7 @@ export default function Navbar({ currentPage, onNavigate }) {
                         <Heart size={22} />
                     </div>
                     <span className="brand-text">
-                        <span className="text-gradient">HeartAlert</span> AI
+                        <span className="text-gradient">Heart</span>AI
                     </span>
                 </button>
 
