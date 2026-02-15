@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 import {
     Heart,
     AlertTriangle,
@@ -59,6 +60,20 @@ const SEVERITY_CONFIG = {
 };
 
 const PIE_COLORS = ['#06d6a0', '#ffd166', '#ef476f', '#ff9f43', '#8b5cf6'];
+
+// Helper to strip markdown for PDF
+const stripMarkdown = (text) => {
+    if (!text) return "";
+    return text
+        .replace(/\*\*(.*?)\*\*/g, '$1') // Bold
+        .replace(/\*(.*?)\*/g, '$1')     // Italic
+        .replace(/###\s?/g, '')          // H3
+        .replace(/##\s?/g, '')           // H2
+        .replace(/#\s?/g, '')            // H1
+        .replace(/`([^`]+)`/g, '$1')     // Code
+        .replace(/^\s*[\-\*]\s+/gm, '• ') // Bullets
+        .replace(/\n{3,}/g, '\n\n');     // Excessive newlines
+};
 
 export default function ResultCard({ result }) {
     const [heatmap, setHeatmap] = useState(null);
@@ -193,8 +208,9 @@ export default function ResultCard({ result }) {
                 doc.setFontSize(10);
                 doc.setTextColor(51, 65, 85);
 
-                // Process text to handle newlines and bullet points
-                const paragraphs = explanationText.split('\n');
+                // Strip markdown for PDF
+                const cleanText = stripMarkdown(explanationText);
+                const paragraphs = cleanText.split('\n');
 
                 paragraphs.forEach(para => {
                     const cleanPara = para.trim();
@@ -285,8 +301,8 @@ export default function ResultCard({ result }) {
                         <Brain size={16} color="#8b5cf6" />
                         AI Analysis
                     </h4>
-                    <div style={{ fontSize: '0.95rem', lineHeight: '1.6', color: 'var(--text-secondary)', whiteSpace: 'pre-line' }}>
-                        {explanationText}
+                    <div className="markdown-content" style={{ fontSize: '0.95rem', lineHeight: '1.6', color: 'var(--text-secondary)' }}>
+                        <ReactMarkdown>{explanationText}</ReactMarkdown>
                     </div>
                 </div>
             )}
