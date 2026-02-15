@@ -233,6 +233,50 @@ def explain_prediction(model, signal, target_class_idx, window_size=10, stride=5
     return heatmap.tolist()
 
 
+def extract_features(signal, fs=125):
+    """
+    Extract basic features from the ECG signal (R-peaks, RR intervals, Heart Rate).
+    Note: MIT-BIH is originally 360Hz, but if this is a snippet, we assume 
+    roughly 125Hz or resampled. We will use a simple heuristic.
+    """
+    # Simple R-peak detection based on threshold
+    # Normalize signal
+    sig_min, sig_max = np.min(signal), np.max(signal)
+    if sig_max - sig_min == 0:
+        return {"bpm": 0, "rr_avg": 0, "amplitude": 0}
+        
+    norm_signal = (signal - sig_min) / (sig_max - sig_min)
+    
+    # Threshold for R-peaks (e.g., 0.6)
+    peaks = []
+    threshold = 0.6
+    for i in range(1, len(norm_signal) - 1):
+        if norm_signal[i] > threshold and \
+           norm_signal[i] > norm_signal[i-1] and \
+           norm_signal[i] > norm_signal[i+1]:
+            # simple local max above threshold
+            if len(peaks) == 0 or (i - peaks[-1]) > (0.2 * fs): # refractory period ~200ms
+                peaks.append(i)
+                
+    features = {
+        "bpm": 0,
+        "rr_avg": 0,
+        "amplitude": round(sig_max - sig_min, 3),
+        "peak_count": len(peaks)
+    }
+    
+    if len(peaks) > 1:
+        rr_intervals = np.diff(peaks)
+        rr_avg_samples = np.mean(rr_intervals)
+        rr_avg_sec = rr_avg_samples / fs
+        bpm = 60.0 / rr_avg_sec if rr_avg_sec > 0 else 0
+        
+        features["bpm"] = int(round(bpm))
+        features["rr_avg"] = int(round(rr_avg_sec * 1000)) # ms
+        
+    return features
+
+
 @app.route("/api/explain", methods=["POST"])
 def explain():
     """Explain a specific ECG prediction using occlusion sensitivity AND LLM text."""
@@ -249,19 +293,25 @@ def explain():
     heatmap = explain_prediction(model, signal_arr, label_idx)
     
     # 2. Textual Explanation (LLM)
-    # We construct a prompt detailing the finding and asking for clinical context.
+    # Extract features for context
+    feats = extract_features(signal_arr)
+    
     beat_type = CLASS_MAPPING.get(label_idx, "Unknown")
     severity = CLASS_SEVERITY.get(label_idx, "unknown")
     
     explanation_prompt = (
         f"Act as an expert cardiologist explaining an ECG finding to a patient. "
-        f"The ECG analysis has detected: '{beat_type}' (Severity: {severity}).\n\n"
+        f"The ECG analysis has detected: '{beat_type}' (Severity: {severity}).\n"
+        f"**Signal Metrics** derived from this specific heartbeat:\n"
+        f"- Estimated Heart Rate: ~{feats['bpm']} BPM\n"
+        f"- Average R-R Interval: ~{feats['rr_avg']} ms\n"
+        f"- QRS Amplitude (approx): {feats['amplitude']} units\n\n"
         f"Please provide a detailed explanation structured as follows:\n"
-        f"1. **What is this?**: Briefly define '{beat_type}'.\n"
-        f"2. **Comparison with Normal Heartbeat**: Explicitly compare the structure of a Normal Sinus Rhythm (which has a clear P-wave, narrow QRS complex, and regular rhythm) "
-        f"with the structure of this specific '{beat_type}'. Highlight differences in P-waves, QRS width, or morphology.\n"
-        f"3. **Key Characteristics**: List the specific visual features seen in the ECG for this arrhythmia (e.g., 'premature beat', 'wide QRS', 'compensatory pause').\n"
-        f"4. **Clinical implication**: Briefly mention if this is generally benign or requires attention (based on Severity: {severity}).\n\n"
+        f"1. **Analysis of THIS Signal**: Interpret the metrics above. Is the heart rate normal, tachycardic, or bradycardic? Is the R-R interval regular? "
+        f"Does this support the diagnosis of {beat_type}?\n"
+        f"2. **Comparison with Normal Heartbeat**: Compare the structure of a Normal Sinus Rhythm (clear P-wave, regular rhythm, 60-100 BPM) "
+        f"with this specific detected arrhythmia. Highlight differences in P-waves, QRS width, or morphology.\n"
+        f"3. **Clinical Implication**: Briefly mention if this is generally benign or requires attention (based on Severity: {severity}).\n\n"
         f"Keep the tone reassuring but clinical and precise. Use bullet points for clarity."
     )
     

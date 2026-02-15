@@ -104,42 +104,50 @@ export default function ResultCard({ result }) {
             const doc = new jsPDF('p', 'mm', 'a4');
             const pageWidth = doc.internal.pageSize.getWidth();
             const pageHeight = doc.internal.pageSize.getHeight();
+            const margin = 15;
+            let y = 20;
 
-            // Header
-            doc.setFillColor(248, 250, 252);
-            doc.rect(0, 0, pageWidth, 40, 'F');
+            // Helper to check page break
+            const checkPageBreak = (heightNeeded) => {
+                if (y + heightNeeded > pageHeight - margin) {
+                    doc.addPage();
+                    y = 20; // Reset Y
+                }
+            };
+
+            // Title
             doc.setFontSize(22);
             doc.setTextColor(30, 41, 59);
-            doc.text("HeartAI Analysis Report", 15, 25);
+            doc.text("HeartAI Analysis Report", margin, y);
+            y += 8;
 
             doc.setFontSize(10);
             doc.setTextColor(100, 116, 139);
-            doc.text(`Generated: ${new Date().toLocaleString()}`, 15, 33);
+            doc.text(`Generated: ${new Date().toLocaleString()}`, margin, y);
+            y += 15;
 
-            let y = 50;
-
-            // Summary Info
+            // Summary
             doc.setFontSize(14);
             doc.setTextColor(30, 41, 59);
-            doc.text("Diagnosis Summary", 15, y);
-            y += 10;
+            doc.text("Diagnosis Summary", margin, y);
+            y += 8;
 
             doc.setFontSize(11);
             doc.setTextColor(71, 85, 105);
-            doc.text(`Condition: ${result.beat_type}`, 15, y);
+            doc.text(`Condition: ${result.beat_type}`, margin, y);
             doc.text(`Severity: ${result.severity.toUpperCase()}`, 120, y);
-            y += 8;
-            doc.text(`Confidence: ${result.confidence}%`, 15, y);
+            y += 6;
+            doc.text(`Confidence: ${result.confidence}%`, margin, y);
             doc.text(`Signal Quality: ${result.sqi_quality || 'N/A'}`, 120, y);
             y += 15;
 
-            // Capture Chart
+            // Chart
             const chartEl = document.querySelector('.recharts-wrapper');
             if (chartEl) {
                 doc.setFontSize(14);
                 doc.setTextColor(30, 41, 59);
-                doc.text("ECG Waveform Analysis", 15, y);
-                y += 5;
+                doc.text("ECG Waveform Analysis", margin, y);
+                y += 6;
 
                 const canvas = await html2canvas(chartEl, {
                     scale: 2,
@@ -147,42 +155,77 @@ export default function ResultCard({ result }) {
                     logging: false
                 });
                 const imgData = canvas.toDataURL('image/png');
-                const imgWidth = 180;
+                const imgWidth = pageWidth - (margin * 2);
                 const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-                doc.addImage(imgData, 'PNG', 15, y, imgWidth, imgHeight);
+                checkPageBreak(imgHeight + 10);
+                doc.addImage(imgData, 'PNG', margin, y, imgWidth, imgHeight);
                 y += imgHeight + 15;
             }
 
-            // Description
+            // Standard Description
+            checkPageBreak(30);
             doc.setFontSize(14);
             doc.setTextColor(30, 41, 59);
-            doc.text("Clinical Intepretation", 15, y);
+            doc.text("Clinical Interpretation", margin, y);
             y += 8;
 
             doc.setFontSize(10);
             doc.setTextColor(51, 65, 85);
-            const splitText = doc.splitTextToSize(result.description || "No details available.", 180);
-            doc.text(splitText, 15, y);
-            y += (splitText.length * 5) + 10;
+            const splitText = doc.splitTextToSize(result.description || "No details available.", pageWidth - (margin * 2));
 
-            // AI Explanation if available
+            // Render line by line to check for page breaks
+            splitText.forEach(line => {
+                checkPageBreak(5);
+                doc.text(line, margin, y);
+                y += 5;
+            });
+            y += 10;
+
+            // AI Explanation (The long part)
             if (explanationText) {
+                checkPageBreak(30);
                 doc.setFontSize(14);
                 doc.setTextColor(30, 41, 59);
-                doc.text("AI Detailed Explanation", 15, y);
+                doc.text("AI Detailed Analysis", margin, y);
                 y += 8;
+
                 doc.setFontSize(10);
                 doc.setTextColor(51, 65, 85);
-                const aiText = doc.splitTextToSize(explanationText, 180);
-                doc.text(aiText, 15, y);
+
+                // Process text to handle newlines and bullet points
+                const paragraphs = explanationText.split('\n');
+
+                paragraphs.forEach(para => {
+                    const cleanPara = para.trim();
+                    if (!cleanPara) {
+                        y += 3; // minimal spacing for empty lines
+                        return;
+                    }
+
+                    const lines = doc.splitTextToSize(cleanPara, pageWidth - (margin * 2));
+
+                    lines.forEach(line => {
+                        checkPageBreak(5);
+                        doc.text(line, margin, y);
+                        y += 5;
+                    });
+                    y += 2; // Extra paragraph spacing
+                });
             }
 
-            // Footer Disclaimer
+            // Footer
+            checkPageBreak(20);
+            y = Math.max(y, pageHeight - 20); // Push to bottom if space permits, else new page
+            if (y > pageHeight - 20) {
+                doc.addPage();
+                y = pageHeight - 20;
+            }
+
             doc.setFontSize(8);
             doc.setTextColor(148, 163, 184);
-            doc.text("DISCLAIMER: This report is generated by AI (HeartAI) for educational purposes only.", 15, pageHeight - 15);
-            doc.text("Consult a healthcare professional for medical diagnosis.", 15, pageHeight - 10);
+            doc.text("DISCLAIMER: This report is generated by AI (HeartAI) for educational purposes only.", margin, y);
+            doc.text("Consult a healthcare professional for medical diagnosis.", margin, y + 5);
 
             doc.save(`heartai_report_${Date.now()}.pdf`);
 
