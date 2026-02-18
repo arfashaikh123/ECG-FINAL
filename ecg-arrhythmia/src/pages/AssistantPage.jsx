@@ -14,7 +14,7 @@ export default function AssistantPage({ analysisContext }) {
                     <div className="assistant-header-icon">
                         <Sparkles size={28} />
                     </div>
-                    <h1><span className="text-gradient">CardioAI</span> Assistant</h1>
+                    <h1><span className="text-gradient">HeartAI</span> Assistant</h1>
                     <p>
                         AI-powered cardiac intelligence — ask questions about ECG analysis,
                         arrhythmias, and heart health

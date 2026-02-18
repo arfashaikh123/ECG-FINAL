@@ -9,7 +9,7 @@ export default function ChatPanel({ analysisContext = null }) {
         {
             role: 'assistant',
             content:
-                "Hello! I'm **CardioAI**, your intelligent ECG analysis assistant. 🫀\n\n" +
+                "Hello! I'm **HeartAI**, your intelligent ECG analysis assistant. 🫀\n\n" +
                 "I can help you with:\n" +
                 "- Understanding your ECG analysis results\n" +
                 "- Explaining different types of arrhythmias\n" +
@@ -83,7 +83,7 @@ export default function ChatPanel({ analysisContext = null }) {
                         <Sparkles size={18} />
                     </div>
                     <div>
-                        <h3>CardioAI Assistant</h3>
+                        <h3>HeartAI Assistant</h3>
                         <span className="chat-status">
                             <span className="status-dot" /> Powered by Gemini
                         </span>

@@ -41,7 +41,7 @@ The server will start at `http://localhost:5000`.
 | POST | `/api/predict` | Predict arrhythmia from CSV upload or JSON signal |
 | POST | `/api/predict/batch` | Batch predict from CSV |
 | GET | `/api/sample` | Get sample ECG data |
-| POST | `/api/chat` | Chat with CardioAI (LLM) |
+| POST | `/api/chat` | Chat with HeartAI (LLM) |
 | GET | `/api/classes` | Get arrhythmia class info |
 
 ## Deployment on Render

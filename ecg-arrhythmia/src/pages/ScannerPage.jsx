@@ -37,7 +37,7 @@ export default function ScannerPage({ onAnalysisComplete }) {
             setResult(data);
             setStep('result');
 
-            // Pass context to parent for CardioAI
+            // Pass context to parent for HeartAI
             if (onAnalysisComplete) {
                 onAnalysisComplete({
                     beat_type: data.beat_type,
